@@ -16,20 +16,37 @@
                 method: 'POST',
                 body: formData,
             })
-            console.log(result)
+
+            let text_field = document.getElementById('text_field');
+            let json_result = await result.json();
+            text_field.innerHTML = json_result['after'];
         }
     </script>
     <style>
         body{
             width: 100%;
         }
+
+        #text_field {
+            width: 100%;
+            height: 300px;
+        }
+
         
     </style>
 </head>
 <body>
-    <form onsubmit="mySubmit(event)">
-        <input type="file" name="file" id="file">
-        <input type="submit" value="Submit">
-    </form>
+    <div class="container mt-5">
+        <div id="input_container">
+            <form class="row g-3" action="http://localhost:8787/" method="POST" enctype="multipart/form-data" onsubmit="mySubmit(event)">
+                <div class="input-group mb-3 col-auto">
+                    <input type="file" class="form-control" id="file">
+                    <button class="input-group-text btn btn-primary" for="file">Upload</button>
+                </div>
+            </form>
+        </div>
+        <div id="text_field" class="border border-primary rounded">
+        </div>
+    </div>
 </body>
 </html>
