@@ -76,6 +76,7 @@ export default {
 				error: e.message
 			}), {
 				status: 400,
+				headers: corsHeaders
 			})
 		}
 		
