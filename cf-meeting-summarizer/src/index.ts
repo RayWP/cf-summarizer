@@ -31,7 +31,7 @@ import { Ai } from "@cloudflare/ai";
 
 
 export default {
-	
+
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 
 		const allowedMethods = 'GET, HEAD, POST, OPTIONS'
@@ -69,7 +69,7 @@ export default {
 				"@cf/openai/whisper",
 				input
 			  );
-	  
+
 			  textResult = audioToTextResponse.text!
 		} catch (e) {
 			return new Response(JSON.stringify({
@@ -79,7 +79,7 @@ export default {
 				headers: corsHeaders
 			})
 		}
-		
+
 
 		const textSummarizeResponse = await ai.run(
 			"@cf/facebook/bart-large-cnn",
@@ -89,14 +89,23 @@ export default {
 			}
 		)
 
+		const questionGeneratorResponse = await ai.run("@hf/thebloke/mistral-7b-instruct-v0.1-awq", {
+			messages: [
+				{ role: "system", content: "You are a teacher that give questions to students about custom topic"},
+				{ role: "user", content: textSummarizeResponse.summary + "\n End of Article. Ask questions about the article."},
+				{ role: "assistant", content: "output in json array of questions without number order"},
+			]}
+		);
+
 		return new Response(JSON.stringify({
 			"before": textResult,
-			"after": textSummarizeResponse.summary
+			"after": textSummarizeResponse.summary,
+			"questions": JSON.parse(questionGeneratorResponse.response)
 		},),
 		{
 			headers: corsHeaders
 		}
 	)
-	
+
 	},
 };
